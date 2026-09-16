@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>RPG Adventure</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =================================================
+         HOME
+    ================================================== -->
+
+    <div id="homeScreen">
+
+        <div class="homeOverlay"></div>
+
+
+        <div class="homeContent">
+
+            <div class="gameLogo">
+                ⚔️
+            </div>
+
+
+            <h1>
+                RPG ADVENTURE
+            </h1>
+
+
+            <p class="subtitle">
+                THE ENDLESS WORLD
+            </p>
+
+
+            <div class="homeGold">
+
+                💰
+                <span id="homeGold">0</span>
+                GOLD
+
+            </div>
+
+
+            <div class="menuButtons">
+
+                <button
+                    id="playButton"
+                    class="mainButton"
+                >
+                    ▶ CHƠI
+                </button>
+
+
+                <button
+                    id="shopButton"
+                    class="mainButton"
+                >
+                    🛒 CỬA HÀNG
+                </button>
+
+            </div>
+
+
+            <p class="controls">
+
+                WASD để di chuyển
+                •
+                SPACE để đánh
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         SHOP
+    ================================================== -->
+
+    <div id="shopScreen">
+
+        <div class="shopBox">
+
+
+            <div class="shopHeader">
+
+                <h1>
+                    🛒 CỬA HÀNG
+                </h1>
+
+
+                <div class="shopGold">
+
+                    💰
+                    <span id="shopGold">
+                        0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- DAMAGE -->
+
+            <div class="shopItem">
+
+                <div class="itemIcon">
+                    ⚔️
+                </div>
+
+
+                <div class="itemInfo">
+
+                    <h2>
+                        Tăng sát thương
+                    </h2>
+
+
+                    <p>
+                        +5 Damage
+                    </p>
+
+
+                    <small>
+
+                        Cấp:
+                        <span id="damageLevel">
+                            0
+                        </span>
+
+                    </small>
+
+                </div>
+
+
+                <button
+                    id="damageShop"
+                    class="buyButton"
+                >
+
+                    MUA
+
+                    <br>
+
+                    💰
+                    <span id="damagePrice">
+                        100
+                    </span>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- HP -->
+
+            <div class="shopItem">
+
+                <div class="itemIcon">
+                    ❤️
+                </div>
+
+
+                <div class="itemInfo">
+
+                    <h2>
+                        Tăng máu
+                    </h2>
+
+
+                    <p>
+                        +20 Max HP
+                    </p>
+
+
+                    <small>
+
+                        Cấp:
+                        <span id="hpLevel">
+                            0
+                        </span>
+
+                    </small>
+
+                </div>
+
+
+                <button
+                    id="hpShop"
+                    class="buyButton"
+                >
+
+                    MUA
+
+                    <br>
+
+                    💰
+                    <span id="hpPrice">
+                        100
+                    </span>
+
+                </button>
+
+            </div>
+
+
+
+            <button
+                id="backButton"
+                class="secondaryButton"
+            >
+
+                ← QUAY LẠI
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         GAME
+    ================================================== -->
+
+    <div id="gameScreen">
+
+        <canvas
+            id="gameCanvas"
+            width="1000"
+            height="600"
+        ></canvas>
+
+
+        <button
+            id="gameMenuButton"
+            class="gameMenuButton"
+        >
+
+            ☰ MENU
+
+        </button>
+
+    </div>
+
+
+
+    <script src="game.js"></script>
+
+</body>
+
+</html>
