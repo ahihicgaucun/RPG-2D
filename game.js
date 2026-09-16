@@ -1,5 +1,7 @@
 /* =====================================================
-   RPG ADVENTURE
+   RPG 2D
+   PC: WASD + SPACE
+   MOBILE: BUTTONS
 ===================================================== */
 
 
@@ -7,786 +9,130 @@
    CANVAS
 ===================================================== */
 
-const canvas =
-    document.getElementById(
-        "gameCanvas"
-    );
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
+canvas.width = 1000;
+canvas.height = 600;
 
-const ctx =
-    canvas.getContext(
-        "2d"
-    );
-
-
-/*
-=====================================================
-PIXEL ART
-
-Không làm mờ sprite
-=====================================================
-*/
-
-ctx.imageSmoothingEnabled =
-    false;
-
-
-const GAME_WIDTH =
-    1000;
-
-
-const GAME_HEIGHT =
-    600;
-
-
-canvas.width =
-    GAME_WIDTH;
-
-
-canvas.height =
-    GAME_HEIGHT;
+ctx.imageSmoothingEnabled = false;
 
 
 /* =====================================================
    SCREEN
 ===================================================== */
 
-const homeScreen =
-    document.getElementById(
-        "homeScreen"
-    );
+const homeScreen = document.getElementById("homeScreen");
+const shopScreen = document.getElementById("shopScreen");
+const gameScreen = document.getElementById("gameScreen");
 
 
-const shopScreen =
-    document.getElementById(
-        "shopScreen"
-    );
-
-
-const gameScreen =
-    document.getElementById(
-        "gameScreen"
-    );
+const playBtn = document.getElementById("playBtn");
+const shopBtn = document.getElementById("shopBtn");
+const backHomeBtn = document.getElementById("backHomeBtn");
+const gameMenuBtn = document.getElementById("gameMenuBtn");
 
 
 /* =====================================================
-   BUTTON
+   STORAGE
 ===================================================== */
 
-document.getElementById(
-    "playButton"
-).onclick =
-    function () {
+let money = Number(localStorage.getItem("rpgGold")) || 0;
 
-        startGame();
+let damageLevel =
+    Number(localStorage.getItem("damageLevel")) || 0;
 
-    };
-
-
-document.getElementById(
-    "shopButton"
-).onclick =
-    function () {
-
-        showShop();
-
-    };
-
-
-document.getElementById(
-    "backButton"
-).onclick =
-    function () {
-
-        showHome();
-
-    };
-
-
-document.getElementById(
-    "gameMenuButton"
-).onclick =
-    function () {
-
-        saveGold();
-
-        showHome();
-
-    };
-
-
-/* =====================================================
-   LOCAL STORAGE
-===================================================== */
-
-let savedGold =
-    Number(
-        localStorage.getItem(
-            "rpgGold"
-        )
-    ) || 0;
-
-
-let savedDamageLevel =
-    Number(
-        localStorage.getItem(
-            "damageLevel"
-        )
-    ) || 0;
-
-
-let savedHpLevel =
-    Number(
-        localStorage.getItem(
-            "hpLevel"
-        )
-    ) || 0;
-
-
-/* =====================================================
-   GOLD UI
-===================================================== */
-
-function updateGoldUI() {
-
-    document.getElementById(
-        "homeGold"
-    ).textContent =
-        savedGold;
-
-
-    document.getElementById(
-        "shopGold"
-    ).textContent =
-        savedGold;
-
-
-    document.getElementById(
-        "damagePrice"
-    ).textContent =
-
-        100 +
-        savedDamageLevel *
-        75;
-
-
-    document.getElementById(
-        "hpPrice"
-    ).textContent =
-
-        100 +
-        savedHpLevel *
-        75;
-
-
-    document.getElementById(
-        "damageLevel"
-    ).textContent =
-
-        savedDamageLevel;
-
-
-    document.getElementById(
-        "hpLevel"
-    ).textContent =
-
-        savedHpLevel;
-
-}
-
-
-/* =====================================================
-   SAVE GOLD
-===================================================== */
-
-function saveGold() {
-
-    savedGold =
-        player.money;
-
-
-    localStorage.setItem(
-        "rpgGold",
-        String(savedGold)
-    );
-
-
-    updateGoldUI();
-
-}
-
-
-/* =====================================================
-   GOLD POPUP
-===================================================== */
-
-let goldPopups = [];
-
-
-function showGoldPopup(
-    amount
-) {
-
-    goldPopups.push({
-
-        amount:
-            amount,
-
-        life:
-            60
-
-    });
-
-}
-
-
-function updateGoldPopups() {
-
-    for (
-        let i =
-            goldPopups.length - 1;
-
-        i >= 0;
-
-        i--
-    ) {
-
-        goldPopups[i].life--;
-
-
-        if (
-            goldPopups[i].life <=
-            0
-        ) {
-
-            goldPopups.splice(
-                i,
-                1
-            );
-
-        }
-
-    }
-
-}
-
-
-function drawGoldPopups() {
-
-    ctx.save();
-
-
-    ctx.textAlign =
-        "center";
-
-
-    ctx.font =
-        "bold 16px Arial";
-
-
-    for (
-        const popup
-        of goldPopups
-    ) {
-
-        ctx.fillStyle =
-            "#ffd700";
-
-
-        ctx.fillText(
-
-            `+${popup.amount} 💰`,
-
-            canvas.width / 2,
-
-            180 -
-            (
-                60 -
-                popup.life
-            )
-
-        );
-
-    }
-
-
-    ctx.restore();
-
-}
-
-
-/* =====================================================
-   SCREEN
-===================================================== */
-
-function showHome() {
-
-    homeScreen.style.display =
-        "flex";
-
-
-    shopScreen.style.display =
-        "none";
-
-
-    gameScreen.style.display =
-        "none";
-
-
-    updateGoldUI();
-
-}
-
-
-function showShop() {
-
-    homeScreen.style.display =
-        "none";
-
-
-    shopScreen.style.display =
-        "flex";
-
-
-    gameScreen.style.display =
-        "none";
-
-
-    updateGoldUI();
-
-}
-
-
-function startGame() {
-
-    homeScreen.style.display =
-        "none";
-
-
-    shopScreen.style.display =
-        "none";
-
-
-    gameScreen.style.display =
-        "block";
-
-
-    resetGame();
-
-}
-
-
-/* =====================================================
-   SHOP DAMAGE
-===================================================== */
-
-document.getElementById(
-    "damageShop"
-).onclick =
-    function () {
-
-        const price =
-
-            100 +
-            savedDamageLevel *
-            75;
-
-
-        if (
-            savedGold >=
-            price
-        ) {
-
-            savedGold -=
-                price;
-
-
-            savedDamageLevel++;
-
-
-            localStorage.setItem(
-                "rpgGold",
-                savedGold
-            );
-
-
-            localStorage.setItem(
-                "damageLevel",
-                savedDamageLevel
-            );
-
-
-            player.money =
-                savedGold;
-
-
-            player.damage =
-
-                25 +
-                savedDamageLevel *
-                5;
-
-
-            updateGoldUI();
-
-        } else {
-
-            alert(
-                "❌ Không đủ Gold!"
-            );
-
-        }
-
-    };
-
-
-/* =====================================================
-   SHOP HP
-===================================================== */
-
-document.getElementById(
-    "hpShop"
-).onclick =
-    function () {
-
-        const price =
-
-            100 +
-            savedHpLevel *
-            75;
-
-
-        if (
-            savedGold >=
-            price
-        ) {
-
-            savedGold -=
-                price;
-
-
-            savedHpLevel++;
-
-
-            localStorage.setItem(
-                "rpgGold",
-                savedGold
-            );
-
-
-            localStorage.setItem(
-                "hpLevel",
-                savedHpLevel
-            );
-
-
-            player.money =
-                savedGold;
-
-
-            /*
-            Nâng Max HP
-            */
-
-            const oldMaxHp =
-                player.maxHp;
-
-
-            player.maxHp =
-
-                100 +
-                savedHpLevel *
-                20;
-
-
-            /*
-            Giữ phần trăm máu
-            */
-
-            if (
-                oldMaxHp > 0
-            ) {
-
-                const hpPercent =
-
-                    player.hp /
-                    oldMaxHp;
-
-
-                player.hp =
-
-                    player.maxHp *
-                    hpPercent;
-
-            }
-
-
-            updateGoldUI();
-
-        } else {
-
-            alert(
-                "❌ Không đủ Gold!"
-            );
-
-        }
-
-    };
-
-
-/* =====================================================
-   MAP
-===================================================== */
-
-const CHUNK_SIZE =
-    800;
-
-
-const CHUNK_RADIUS =
-    2;
-
-
-const chunks =
-    new Map();
+let hpLevel =
+    Number(localStorage.getItem("hpLevel")) || 0;
 
 
 /* =====================================================
    IMAGES
 ===================================================== */
 
+function loadImage(src) {
+    const img = new Image();
+
+    img.src = src;
+
+    return img;
+}
+
+
 const images = {
 
-    player:
-        new Image(),
+    player: loadImage("assets/player.png"),
 
     playerAttack:
-        new Image(),
+        loadImage("assets/player_attack.png"),
 
-    tree:
-        new Image(),
+    enemy:
+        loadImage("assets/enemy.png"),
 
-    rock:
-        new Image(),
+    enemy1:
+        loadImage("assets/enemy1.png"),
 
-    grass:
-        new Image(),
+    enemy2:
+        loadImage("assets/enemy2.png"),
+
+    enemy3:
+        loadImage("assets/enemy3.png"),
+
+    enemy4:
+        loadImage("assets/enemy4.png"),
 
     fireball:
-        new Image(),
+        loadImage("assets/fireball.png"),
 
     bullet:
-        new Image(),
+        loadImage("assets/bullet.png"),
 
     gas:
-        new Image(),
+        loadImage("assets/gas.png"),
+
+    tree:
+        loadImage("assets/tree.png"),
+
+    rock:
+        loadImage("assets/rock.png"),
+
+    grass:
+        loadImage("assets/grass.png"),
 
     sword:
-        new Image(),
-
-    npc:
-        new Image()
-
+        loadImage("assets/sword.png")
 };
 
 
-images.player.src =
-    "./assets/player.png";
-
-
-images.playerAttack.src =
-    "./assets/player_attack.png";
-
-
-images.tree.src =
-    "./assets/tree.png";
-
-
-images.rock.src =
-    "./assets/rock.png";
-
-
-images.grass.src =
-    "./assets/grass.png";
-
-
-images.fireball.src =
-    "./assets/fireball.png";
-
-
-images.bullet.src =
-    "./assets/bullet.png";
-
-
-images.gas.src =
-    "./assets/gas.png";
-
-
-images.sword.src =
-    "./assets/sword.png";
-
-
-images.npc.src =
-    "./assets/npc.png";
-
-
 /* =====================================================
-   ENEMY DATABASE
-===================================================== */
-
-const enemyDatabase = [
-
-    {
-        file:
-            "./assets/enemy.png",
-
-        height:
-            70
-    },
-
-
-    {
-        file:
-            "./assets/enemy1.png",
-
-        height:
-            70
-    },
-
-
-    {
-        file:
-            "./assets/enemy2.png",
-
-        height:
-            90
-    },
-
-
-    {
-        file:
-            "./assets/enemy3.png",
-
-        height:
-            75
-    },
-
-
-    {
-        file:
-            "./assets/enemy4.png",
-
-        height:
-            78
-    }
-
-];
-
-
-const enemyImages = [];
-
-
-/* =====================================================
-   LOAD ENEMY
-===================================================== */
-
-function loadEnemyImages() {
-
-    for (
-        let i = 0;
-
-        i <
-        enemyDatabase.length;
-
-        i++
-    ) {
-
-        const image =
-            new Image();
-
-
-        image.src =
-            enemyDatabase[i].file;
-
-
-        image.onload =
-            function () {
-
-                enemyImages[i] =
-                    image;
-
-            };
-
-    }
-
-}
-
-
-loadEnemyImages();
-
-
-/* =====================================================
-   IMAGE READY
-===================================================== */
-
-function imageReady(
-    image
-) {
-
-    return (
-
-        image &&
-
-        image.complete &&
-
-        image.naturalWidth > 0
-
-    );
-
-}
-
-
-/* =====================================================
-   KEYBOARD
+   INPUT
 ===================================================== */
 
 const keys = {};
 
 
-document.addEventListener(
-    "keydown",
-    function (e) {
+window.addEventListener("keydown", e => {
 
-        keys[
-            e.key.toLowerCase()
-        ] = true;
+    keys[e.key.toLowerCase()] = true;
 
+    if (e.code === "Space") {
+        keys[" "] = true;
 
-        if (
-            e.code ===
-            "Space"
-        ) {
-
-            e.preventDefault();
-
-
-            attack();
-
-        }
-
+        e.preventDefault();
     }
-);
+
+});
 
 
-document.addEventListener(
-    "keyup",
-    function (e) {
+window.addEventListener("keyup", e => {
 
-        keys[
-            e.key.toLowerCase()
-        ] = false;
+    keys[e.key.toLowerCase()] = false;
 
+    if (e.code === "Space") {
+        keys[" "] = false;
     }
-);
+
+});
 
 
 /* =====================================================
@@ -795,599 +141,334 @@ document.addEventListener(
 
 const player = {
 
-    x:
-        CHUNK_SIZE / 2,
+    x: 0,
+    y: 0,
 
-    y:
-        CHUNK_SIZE / 2,
+    width: 60,
+    height: 75,
 
-    width:
-        40,
+    speed: 4,
 
-    height:
-        40,
+    maxHp: 100 + hpLevel * 25,
 
-    speed:
-        4,
+    hp: 100 + hpLevel * 25,
 
-    hp:
-        100,
+    damage: 10 + damageLevel * 5,
 
-    maxHp:
+    level: 1,
 
-        100 +
-        savedHpLevel *
-        20,
+    exp: 0,
 
-    level:
-        1,
+    expNeed: 100,
 
-    exp:
-        0,
+    money: money,
 
-    expNeed:
-        100,
+    attacking: false,
 
-    money:
-        savedGold,
+    attackTimer: 0,
 
-    damage:
+    frame: 0,
 
-        25 +
-        savedDamageLevel *
-        5,
+    frameTimer: 0,
 
-    attackCooldown:
-        0,
-
-    direction:
-        "right",
-
-    isAttacking:
-        false,
-
-    attackFrame:
-        0,
-
-    attackFrameTimer:
-        0,
-
-    spriteFrame:
-        0,
-
-    spriteTimer:
-        0,
-
-    moving:
-        false
-
+    direction: 1
 };
+
+
+/* =====================================================
+   WORLD
+===================================================== */
+
+const WORLD_SIZE = 5000;
+
+const TILE_SIZE = 80;
+
+let camera = {
+
+    x: 0,
+    y: 0
+};
+
+
+/* =====================================================
+   OBSTACLES
+===================================================== */
+
+let obstacles = [];
+
+
+function createObstacles() {
+
+    obstacles = [];
+
+    for (let i = 0; i < 180; i++) {
+
+        const type =
+            Math.random() < 0.65
+                ? "tree"
+                : "rock";
+
+        const x =
+            Math.random() *
+            (WORLD_SIZE - 100) + 50;
+
+        const y =
+            Math.random() *
+            (WORLD_SIZE - 100) + 50;
+
+        if (
+            Math.abs(x - player.x) < 200 &&
+            Math.abs(y - player.y) < 200
+        ) {
+            continue;
+        }
+
+        obstacles.push({
+
+            x,
+            y,
+
+            type,
+
+            width:
+                type === "tree"
+                    ? 65
+                    : 60,
+
+            height:
+                type === "tree"
+                    ? 85
+                    : 50
+        });
+    }
+}
+
+
+/* =====================================================
+   ENEMIES
+===================================================== */
+
+const enemyDatabase = [
+
+    {
+        image: images.enemy,
+        height: 70,
+        hp: 30,
+        damage: 5,
+        speed: 1.1,
+        exp: 20,
+        gold: 5
+    },
+
+    {
+        image: images.enemy1,
+        height: 70,
+        hp: 45,
+        damage: 7,
+        speed: 1.3,
+        exp: 30,
+        gold: 8
+    },
+
+    {
+        image: images.enemy2,
+        height: 90,
+        hp: 70,
+        damage: 10,
+        speed: 0.9,
+        exp: 45,
+        gold: 15
+    },
+
+    {
+        image: images.enemy3,
+        height: 75,
+        hp: 55,
+        damage: 8,
+        speed: 1.4,
+        exp: 40,
+        gold: 12
+    },
+
+    {
+        image: images.enemy4,
+        height: 78,
+        hp: 90,
+        damage: 12,
+        speed: 0.8,
+        exp: 60,
+        gold: 20
+    }
+];
+
+
+let enemies = [];
+
+
+/* =====================================================
+   DROPS
+===================================================== */
+
+let drops = [];
+
+
+/* =====================================================
+   PROJECTILES
+===================================================== */
+
+let projectiles = [];
 
 
 /* =====================================================
    SKILLS
 ===================================================== */
 
-const skills = {
+let skills = {
 
-    fireball:
-        false,
+    fireball: true,
 
-    gas:
-        false,
+    gas: true,
 
-    gun:
-        false
-
+    bullet: true
 };
 
 
-let selectingSkill =
-    false;
-
-
 /* =====================================================
-   GAME DATA
+   LEVEL UP
 ===================================================== */
 
-let enemies = [];
+function addExp(amount) {
 
+    player.exp += amount;
 
-let drops = [];
 
+    while (player.exp >= player.expNeed) {
 
-let projectiles = [];
+        player.exp -= player.expNeed;
 
+        player.level++;
 
-const camera = {
-
-    x:
-        0,
-
-    y:
-        0
-
-};
-
-
-let gameOver =
-    false;
-
-
-/* =====================================================
-   CHUNK RANDOM
-===================================================== */
-
-function chunkSeed(
-    cx,
-    cy
-) {
-
-    const n =
-
-        Math.sin(
-            cx *
-            127.1 +
-
-            cy *
-            311.7
-        )
-        *
-        43758.5453123;
-
-
-    return n -
-        Math.floor(n);
-
-}
-
-
-function seededRandom(
-    seed
-) {
-
-    const x =
-        Math.sin(seed) *
-        10000;
-
-
-    return x -
-        Math.floor(x);
-
-}
-
-
-/* =====================================================
-   CREATE CHUNK
-===================================================== */
-
-function createChunk(
-    cx,
-    cy
-) {
-
-    const key =
-        `${cx},${cy}`;
-
-
-    if (
-        chunks.has(key)
-    ) {
-
-        return chunks.get(
-            key
-        );
-
-    }
-
-
-    const chunk = {
-
-        x:
-            cx *
-            CHUNK_SIZE,
-
-        y:
-            cy *
-            CHUNK_SIZE,
-
-        obstacles: [],
-
-        enemies: []
-
-    };
-
-
-    const seed =
-        chunkSeed(
-            cx,
-            cy
-        );
-
-
-    /* =========================
-       TREES
-    ========================== */
-
-    const treeCount =
-
-        8 +
-        Math.floor(
-            seed * 8
-        );
-
-
-    for (
-        let i = 0;
-
-        i <
-        treeCount;
-
-        i++
-    ) {
-
-        const rx =
-
-            seededRandom(
-                seed +
-                i * 10
-            );
-
-
-        const ry =
-
-            seededRandom(
-                seed +
-                i * 20
-            );
-
-
-        chunk.obstacles.push({
-
-            x:
-
-                chunk.x +
-                rx *
-                (
-                    CHUNK_SIZE -
-                    80
-                ) +
-                40,
-
-            y:
-
-                chunk.y +
-                ry *
-                (
-                    CHUNK_SIZE -
-                    80
-                ) +
-                40,
-
-            width:
-                60,
-
-            height:
-                70,
-
-            type:
-                "tree"
-
-        });
-
-    }
-
-
-    /* =========================
-       ROCK
-    ========================== */
-
-    const rockCount =
-
-        5 +
-        Math.floor(
-            seed * 6
-        );
-
-
-    for (
-        let i = 0;
-
-        i <
-        rockCount;
-
-        i++
-    ) {
-
-        const rx =
-
-            seededRandom(
-
-                seed +
-                i * 30 +
-                100
-
-            );
-
-
-        const ry =
-
-            seededRandom(
-
-                seed +
-                i * 40 +
-                200
-
-            );
-
-
-        chunk.obstacles.push({
-
-            x:
-
-                chunk.x +
-                rx *
-                (
-                    CHUNK_SIZE -
-                    80
-                ) +
-                40,
-
-            y:
-
-                chunk.y +
-                ry *
-                (
-                    CHUNK_SIZE -
-                    80
-                ) +
-                40,
-
-            width:
-                55,
-
-            height:
-                45,
-
-            type:
-                "rock"
-
-        });
-
-    }
-
-
-    /* =========================
-       ENEMY
-    ========================== */
-
-    const enemyCount =
-
-        5 +
-        Math.floor(
-            seed * 5
-        );
-
-
-    for (
-        let i = 0;
-
-        i <
-        enemyCount;
-
-        i++
-    ) {
-
-        const rx =
-
-            seededRandom(
-
-                seed +
-                i * 50 +
-                500
-
-            );
-
-
-        const ry =
-
-            seededRandom(
-
-                seed +
-                i * 60 +
-                700
-
-            );
-
-
-        const enemyX =
-
-            chunk.x +
-            rx *
-            (
-                CHUNK_SIZE -
-                100
-            ) +
-            50;
-
-
-        const enemyY =
-
-            chunk.y +
-            ry *
-            (
-                CHUNK_SIZE -
-                100
-            ) +
-            50;
-
-
-        const distance =
-
-            Math.hypot(
-
-                enemyX -
-                player.x,
-
-                enemyY -
-                player.y
-
-            );
-
-
-        if (
-            distance <=
-            180
-        ) {
-
-            continue;
-
-        }
-
-
-        const imageIndex =
-
+        player.expNeed =
             Math.floor(
+                player.expNeed * 1.35
+            );
 
+        player.maxHp += 15;
+
+        player.hp = player.maxHp;
+
+        showLevelUp();
+    }
+}
+
+
+function showLevelUp() {
+
+    const text = document.createElement("div");
+
+    text.innerHTML =
+        `⬆️ LEVEL ${player.level}!`;
+
+    text.style.position = "fixed";
+    text.style.left = "50%";
+    text.style.top = "45%";
+    text.style.transform = "translate(-50%,-50%)";
+
+    text.style.fontSize = "40px";
+    text.style.fontWeight = "bold";
+
+    text.style.color = "#ffd75c";
+
+    text.style.zIndex = "20000";
+
+    text.style.textShadow =
+        "0 4px 10px black";
+
+    document.body.appendChild(text);
+
+
+    setTimeout(() => {
+
+        text.remove();
+
+    }, 1500);
+}
+
+
+/* =====================================================
+   SPAWN ENEMY
+===================================================== */
+
+function spawnEnemy() {
+
+    const type =
+        enemyDatabase[
+            Math.floor(
                 Math.random() *
                 enemyDatabase.length
-
-            );
-
-
-        const enemy = {
-
-            x:
-                enemyX,
-
-            y:
-                enemyY,
-
-            width:
-                40,
-
-            height:
-                40,
-
-            imageIndex:
-                imageIndex,
-
-            speed:
-
-                1 +
-                seededRandom(
-                    seed + i
-                ) *
-                0.6,
-
-            hp:
-                60,
-
-            maxHp:
-                60,
-
-            damage:
-                8,
-
-            attackCooldown:
-                0,
-
-            dead:
-                false,
-
-            spriteFrame:
-                0,
-
-            spriteTimer:
-                0,
-
-            direction:
-                "right"
-
-        };
+            )
+        ];
 
 
-        chunk.enemies.push(
-            enemy
-        );
+    let angle =
+        Math.random() *
+        Math.PI * 2;
+
+    let distance =
+        500 + Math.random() * 800;
 
 
-        enemies.push(
-            enemy
-        );
+    let x =
+        player.x +
+        Math.cos(angle) *
+        distance;
 
-    }
+    let y =
+        player.y +
+        Math.sin(angle) *
+        distance;
 
 
-    chunks.set(
-        key,
-        chunk
+    x = Math.max(
+        100,
+        Math.min(WORLD_SIZE - 100, x)
+    );
+
+    y = Math.max(
+        100,
+        Math.min(WORLD_SIZE - 100, y)
     );
 
 
-    return chunk;
+    enemies.push({
 
-}
+        x,
+        y,
 
+        width: type.height,
+        height: type.height,
 
-/* =====================================================
-   ENSURE CHUNKS
-===================================================== */
+        image: type.image,
 
-function ensureChunksAroundPlayer() {
+        hp: type.hp +
+            player.level * 5,
 
-    const cx =
+        maxHp:
+            type.hp +
+            player.level * 5,
 
-        Math.floor(
+        damage: type.damage,
 
-            player.x /
-            CHUNK_SIZE
+        speed: type.speed,
 
-        );
+        exp: type.exp,
 
+        gold: type.gold,
 
-    const cy =
+        frame: 0,
 
-        Math.floor(
-
-            player.y /
-            CHUNK_SIZE
-
-        );
-
-
-    for (
-        let x =
-            -CHUNK_RADIUS;
-
-        x <=
-            CHUNK_RADIUS;
-
-        x++
-    ) {
-
-        for (
-            let y =
-                -CHUNK_RADIUS;
-
-            y <=
-                CHUNK_RADIUS;
-
-            y++
-        ) {
-
-            createChunk(
-
-                cx + x,
-
-                cy + y
-
-            );
-
-        }
-
-    }
-
+        frameTimer: 0
+    });
 }
 
 
@@ -1395,100 +476,47 @@ function ensureChunksAroundPlayer() {
    COLLISION
 ===================================================== */
 
-function rectCollision(
-    a,
-    b
-) {
+function rectCollision(a, b) {
 
     return (
 
-        a.x -
-        a.width / 2
-        <
-        b.x +
-        b.width / 2
+        a.x < b.x + b.width &&
 
-        &&
+        a.x + a.width >
+        b.x &&
 
-        a.x +
-        a.width / 2
-        >
-        b.x -
-        b.width / 2
+        a.y < b.y + b.height &&
 
-        &&
-
-        a.y -
-        a.height / 2
-        <
-        b.y +
-        b.height / 2
-
-        &&
-
-        a.y +
-        a.height / 2
-        >
-        b.y -
-        b.height / 2
-
+        a.y + a.height >
+        b.y
     );
-
 }
 
 
-function checkObstacleCollision(
-    x,
-    y
-) {
+function obstacleCollision(x, y, width, height) {
 
-    const testPlayer = {
+    const test = {
 
-        x:
-            x,
-
-        y:
-            y,
-
-        width:
-            player.width,
-
-        height:
-            player.height
-
+        x,
+        y,
+        width,
+        height
     };
 
 
-    for (
-        const chunk
-        of chunks.values()
-    ) {
+    for (const obstacle of obstacles) {
 
-        for (
-            const obstacle
-            of chunk.obstacles
+        if (
+            rectCollision(
+                test,
+                obstacle
+            )
         ) {
-
-            if (
-
-                rectCollision(
-                    testPlayer,
-                    obstacle
-                )
-
-            ) {
-
-                return true;
-
-            }
-
+            return true;
         }
-
     }
 
-
     return false;
-
 }
 
 
@@ -1496,184 +524,113 @@ function checkObstacleCollision(
    PLAYER MOVEMENT
 ===================================================== */
 
-function updatePlayerMovement() {
+function movePlayer() {
 
-    if (
-        gameOver ||
-        selectingSkill
-    ) {
+    let dx = 0;
+    let dy = 0;
 
-        player.moving =
-            false;
 
-        return;
+    if (keys["w"]) dy -= 1;
 
+    if (keys["s"]) dy += 1;
+
+    if (keys["a"]) {
+
+        dx -= 1;
+
+        player.direction = -1;
+    }
+
+    if (keys["d"]) {
+
+        dx += 1;
+
+        player.direction = 1;
     }
 
 
-    let dx =
-        0;
-
-
-    let dy =
-        0;
-
-
-    if (
-        keys["w"]
-    ) {
-
-        dy--;
-
-    }
-
-
-    if (
-        keys["s"]
-    ) {
-
-        dy++;
-
-    }
-
-
-    if (
-        keys["a"]
-    ) {
-
-        dx--;
-
-        player.direction =
-            "left";
-
-    }
-
-
-    if (
-        keys["d"]
-    ) {
-
-        dx++;
-
-        player.direction =
-            "right";
-
-    }
-
-
-    if (
-        dx !== 0 ||
-        dy !== 0
-    ) {
+    if (dx !== 0 || dy !== 0) {
 
         const length =
-            Math.hypot(
-                dx,
-                dy
+            Math.sqrt(
+                dx * dx +
+                dy * dy
             );
 
-
-        dx /=
-            length;
-
-
-        dy /=
-            length;
+        dx /= length;
+        dy /= length;
 
 
-        player.moving =
-            true;
+        const newX =
+            player.x +
+            dx * player.speed;
 
-    } else {
-
-        player.moving =
-            false;
-
-    }
-
-
-    const newX =
-
-        player.x +
-        dx *
-        player.speed;
-
-
-    if (
-        !checkObstacleCollision(
-            newX,
-            player.y
-        )
-    ) {
-
-        player.x =
-            newX;
-
-    }
-
-
-    const newY =
-
-        player.y +
-        dy *
-        player.speed;
-
-
-    if (
-        !checkObstacleCollision(
-            player.x,
-            newY
-        )
-    ) {
-
-        player.y =
-            newY;
-
-    }
-
-
-    if (
-        player.moving
-    ) {
-
-        player.spriteTimer++;
+        const newY =
+            player.y +
+            dy * player.speed;
 
 
         if (
-            player.spriteTimer >=
-            8
+            !obstacleCollision(
+                newX,
+                player.y,
+                player.width,
+                player.height
+            )
         ) {
-
-            player.spriteTimer =
-                0;
-
-
-            player.spriteFrame++;
+            player.x = newX;
+        }
 
 
-            if (
-                player.spriteFrame >=
-                4
-            ) {
+        if (
+            !obstacleCollision(
+                player.x,
+                newY,
+                player.width,
+                player.height
+            )
+        ) {
+            player.y = newY;
+        }
 
-                player.spriteFrame =
-                    0;
 
-            }
+        player.frameTimer++;
 
+        if (player.frameTimer > 8) {
+
+            player.frame++;
+
+            player.frame %= 4;
+
+            player.frameTimer = 0;
         }
 
     } else {
 
-        player.spriteTimer =
-            0;
-
-
-        player.spriteFrame =
-            0;
-
+        player.frame = 0;
     }
 
+
+    player.x =
+        Math.max(
+            0,
+            Math.min(
+                WORLD_SIZE -
+                player.width,
+                player.x
+            )
+        );
+
+
+    player.y =
+        Math.max(
+            0,
+            Math.min(
+                WORLD_SIZE -
+                player.height,
+                player.y
+            )
+        );
 }
 
 
@@ -1683,230 +640,65 @@ function updatePlayerMovement() {
 
 function attack() {
 
-    if (
-
-        gameOver ||
-
-        selectingSkill ||
-
-        player.attackCooldown >
-        0
-
-    ) {
-
+    if (player.attackTimer > 0) {
         return;
-
     }
 
 
-    player.attackCooldown =
-        25;
+    player.attacking = true;
+
+    player.attackTimer = 25;
 
 
-    player.isAttacking =
-        true;
+    const attackRange = 100;
 
 
-    player.attackFrame =
-        0;
+    for (const enemy of enemies) {
 
+        const dx =
+            enemy.x -
+            player.x;
 
-    player.attackFrameTimer =
-        0;
-
-
-    for (
-        const enemy
-        of enemies
-    ) {
-
-        if (
-            enemy.dead
-        ) {
-
-            continue;
-
-        }
+        const dy =
+            enemy.y -
+            player.y;
 
 
         const distance =
-
-            Math.hypot(
-
-                enemy.x -
-                player.x,
-
-                enemy.y -
-                player.y
-
+            Math.sqrt(
+                dx * dx +
+                dy * dy
             );
 
 
-        if (
-            distance <
-            75
-        ) {
+        if (distance <= attackRange) {
 
-            enemy.hp -=
-                player.damage;
-
-
-            if (
-                enemy.hp <=
-                0
-            ) {
-
-                killEnemy(
-                    enemy
-                );
-
-            }
-
+            enemy.hp -= player.damage;
         }
-
     }
-
 }
 
 
-/* =====================================================
-   ATTACK ANIMATION
-===================================================== */
+function updateAttack() {
 
-function updateAttackAnimation() {
+    if (keys[" "]) {
 
-    if (
-        !player.isAttacking
-    ) {
-
-        return;
-
+        attack();
     }
 
 
-    player.attackFrameTimer++;
+    if (player.attackTimer > 0) {
 
-
-    if (
-        player.attackFrameTimer >=
-        5
-    ) {
-
-        player.attackFrameTimer =
-            0;
-
-
-        player.attackFrame++;
-
-
-        if (
-            player.attackFrame >=
-            4
-        ) {
-
-            player.attackFrame =
-                0;
-
-
-            player.isAttacking =
-                false;
-
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-   KILL ENEMY
-===================================================== */
-
-function killEnemy(
-    enemy
-) {
-
-    if (
-        enemy.dead
-    ) {
-
-        return;
-
+        player.attackTimer--;
     }
 
 
-    enemy.dead =
-        true;
+    if (
+        player.attackTimer === 0
+    ) {
 
-
-    drops.push({
-
-        x:
-            enemy.x,
-
-        y:
-            enemy.y,
-
-        type:
-            "exp",
-
-        value:
-            25
-
-    });
-
-
-    drops.push({
-
-        x:
-            enemy.x + 15,
-
-        y:
-            enemy.y,
-
-        type:
-            "gold",
-
-        value:
-            10
-
-    });
-
-
-    setTimeout(
-
-        function () {
-
-            if (
-                gameOver
-            ) {
-
-                return;
-
-            }
-
-
-            enemy.hp =
-                enemy.maxHp;
-
-
-            enemy.dead =
-                false;
-
-
-            enemy.spriteFrame =
-                0;
-
-
-            enemy.spriteTimer =
-                0;
-
-        },
-
-        4000
-
-    );
-
+        player.attacking = false;
+    }
 }
 
 
@@ -1916,1112 +708,343 @@ function killEnemy(
 
 function updateEnemies() {
 
-    if (
-        gameOver ||
-        selectingSkill
-    ) {
+    for (let i = enemies.length - 1; i >= 0; i--) {
 
-        return;
-
-    }
-
-
-    for (
-        const enemy
-        of enemies
-    ) {
-
-        if (
-            enemy.dead
-        ) {
-
-            continue;
-
-        }
-
-
-        enemy.spriteTimer++;
-
-
-        if (
-            enemy.spriteTimer >=
-            10
-        ) {
-
-            enemy.spriteTimer =
-                0;
-
-
-            enemy.spriteFrame++;
-
-
-            if (
-                enemy.spriteFrame >=
-                4
-            ) {
-
-                enemy.spriteFrame =
-                    0;
-
-            }
-
-        }
+        const enemy = enemies[i];
 
 
         const dx =
-
             player.x -
             enemy.x;
 
-
         const dy =
-
             player.y -
             enemy.y;
 
 
         const distance =
-
-            Math.hypot(
-                dx,
-                dy
+            Math.sqrt(
+                dx * dx +
+                dy * dy
             );
 
 
-        if (
-            distance > 45
-        ) {
+        if (distance > 0) {
 
-            const moveX =
+            const vx =
+                dx / distance *
+                enemy.speed;
 
-                dx /
-                distance *
+            const vy =
+                dy / distance *
                 enemy.speed;
 
 
-            const moveY =
+            enemy.x += vx;
 
-                dy /
-                distance *
-                enemy.speed;
-
-
-            const newX =
-
-                enemy.x +
-                moveX;
+            enemy.y += vy;
+        }
 
 
-            const newY =
-
-                enemy.y +
-                moveY;
+        enemy.frameTimer++;
 
 
-            if (
-                !checkObstacleCollision(
-                    newX,
-                    enemy.y
-                )
-            ) {
+        if (enemy.frameTimer > 10) {
 
-                enemy.x =
-                    newX;
+            enemy.frame++;
 
-            }
+            enemy.frame %= 4;
 
-
-            if (
-                !checkObstacleCollision(
-                    enemy.x,
-                    newY
-                )
-            ) {
-
-                enemy.y =
-                    newY;
-
-            }
-
-
-            if (
-                dx < 0
-            ) {
-
-                enemy.direction =
-                    "left";
-
-            } else if (
-                dx > 0
-            ) {
-
-                enemy.direction =
-                    "right";
-
-            }
-
+            enemy.frameTimer = 0;
         }
 
 
         if (
-
-            distance < 50 &&
-
-            enemy.attackCooldown <=
-            0
-
+            rectCollision(
+                player,
+                enemy
+            )
         ) {
 
             player.hp -=
-                enemy.damage;
-
-
-            enemy.attackCooldown =
-                50;
-
-
-            if (
-                player.hp <=
-                0
-            ) {
-
-                player.hp =
-                    0;
-
-
-                gameOver =
-                    true;
-
-
-                saveGold();
-
-            }
-
+                enemy.damage *
+                0.02;
         }
 
 
-        if (
-            enemy.attackCooldown >
-            0
-        ) {
+        if (enemy.hp <= 0) {
 
-            enemy.attackCooldown--;
+            drops.push({
 
+                x: enemy.x,
+
+                y: enemy.y,
+
+                exp: enemy.exp,
+
+                gold: enemy.gold,
+
+                type:
+                    Math.random() < 0.5
+                        ? "gold"
+                        : "exp"
+            });
+
+
+            enemies.splice(i, 1);
         }
-
     }
-
 }
 
 
 /* =====================================================
-   DROP UPDATE
+   COLLECT DROPS
 ===================================================== */
 
 function updateDrops() {
 
-    if (
-        gameOver
-    ) {
-
-        return;
-
-    }
-
-
     for (
-        let i =
-            drops.length - 1;
-
+        let i = drops.length - 1;
         i >= 0;
-
         i--
     ) {
 
-        const drop =
-            drops[i];
+        const drop = drops[i];
+
+
+        const dx =
+            player.x -
+            drop.x;
+
+        const dy =
+            player.y -
+            drop.y;
 
 
         const distance =
-
-            Math.hypot(
-
-                drop.x -
-                player.x,
-
-                drop.y -
-                player.y
-
+            Math.sqrt(
+                dx * dx +
+                dy * dy
             );
 
 
-        if (
-            distance <
-            35
-        ) {
+        if (distance < 60) {
 
-            if (
-                drop.type ===
-                "exp"
-            ) {
+            addExp(drop.exp);
 
-                player.exp +=
-                    drop.value;
+            money += drop.gold;
 
+            player.money = money;
 
-                checkLevelUp();
+            saveData();
 
-            }
-
-
-            if (
-                drop.type ===
-                "gold"
-            ) {
-
-                player.money +=
-                    drop.value;
-
-
-                savedGold =
-                    player.money;
-
-
-                localStorage.setItem(
-
-                    "rpgGold",
-
-                    String(
-                        savedGold
-                    )
-
-                );
-
-
-                showGoldPopup(
-                    drop.value
-                );
-
-
-                updateGoldUI();
-
-            }
-
-
-            drops.splice(
-                i,
-                1
-            );
-
+            drops.splice(i, 1);
         }
-
     }
-
 }
 
 
 /* =====================================================
-   LEVEL UP
+   PROJECTILES
 ===================================================== */
 
-function checkLevelUp() {
-
-    while (
-
-        player.exp >=
-        player.expNeed
-
-    ) {
-
-        player.exp -=
-            player.expNeed;
-
-
-        player.level++;
-
-
-        player.expNeed =
-
-            Math.floor(
-
-                player.expNeed *
-                1.35
-
-            );
-
-
-        player.maxHp +=
-            20;
-
-
-        player.hp =
-            player.maxHp;
-
-
-        player.damage +=
-            5;
-
-
-        if (
-
-            player.level %
-            3 ===
-            0
-
-        ) {
-
-            selectingSkill =
-                true;
-
-
-            createSkillButtons();
-
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-   CHOOSE SKILL
-===================================================== */
-
-function chooseSkill(
-    skill
+function createProjectile(
+    target,
+    type
 ) {
 
-    skills[skill] =
-        true;
+    const dx =
+        target.x -
+        player.x;
+
+    const dy =
+        target.y -
+        player.y;
 
 
-    selectingSkill =
-        false;
-
-}
-
-
-/* =====================================================
-   SKILL BUTTON
-===================================================== */
-
-function createSkillButtons() {
-
-    if (
-        document.getElementById(
-            "skillOverlay"
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    const overlay =
-        document.createElement(
-            "div"
+    const distance =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
         );
 
 
-    overlay.id =
-        "skillOverlay";
+    if (distance === 0) return;
 
 
-    overlay.style.position =
-        "fixed";
+    projectiles.push({
+
+        x: player.x +
+            player.width / 2,
+
+        y: player.y +
+            player.height / 2,
+
+        vx:
+            dx / distance * 7,
+
+        vy:
+            dy / distance * 7,
+
+        damage:
+            type === "fireball"
+                ? player.damage * 1.5
+                : player.damage,
+
+        type
+    });
+}
 
 
-    overlay.style.left =
-        "50%";
+let skillTimer = 0;
 
 
-    overlay.style.top =
-        "50%";
+/* =====================================================
+   AUTO SKILLS
+===================================================== */
+
+function autoSkills() {
+
+    skillTimer++;
+
+    if (skillTimer < 45) {
+        return;
+    }
+
+    skillTimer = 0;
 
 
-    overlay.style.transform =
-        "translate(-50%,-50%)";
+    if (enemies.length === 0) {
+        return;
+    }
 
 
-    overlay.style.background =
-        "#111827";
+    let nearest = enemies[0];
+
+    let nearestDistance = Infinity;
 
 
-    overlay.style.border =
-        "2px solid #e6a629";
+    for (const enemy of enemies) {
+
+        const dx =
+            enemy.x -
+            player.x;
+
+        const dy =
+            enemy.y -
+            player.y;
 
 
-    overlay.style.padding =
-        "30px";
+        const d =
+            Math.sqrt(
+                dx * dx +
+                dy * dy
+            );
 
 
-    overlay.style.color =
-        "white";
+        if (d < nearestDistance) {
+
+            nearest = enemy;
+
+            nearestDistance = d;
+        }
+    }
 
 
-    overlay.style.zIndex =
-        "9999";
+    if (nearestDistance < 500) {
+
+        const skill =
+            Math.floor(
+                Math.random() * 3
+            );
 
 
-    overlay.style.textAlign =
-        "center";
+        if (skill === 0) {
 
-
-    overlay.innerHTML = `
-
-        <h2>
-            🎉 LEVEL UP!
-        </h2>
-
-        <p style="
-            margin:15px 0;
-            color:#aaa;
-        ">
-            Chọn kỹ năng mới
-        </p>
-
-        <button id="skillFire">
-            🔥 Cầu Lửa
-        </button>
-
-        <button id="skillGas">
-            ⛽ Bình Xăng
-        </button>
-
-        <button id="skillGun">
-            🔫 Bắn
-        </button>
-
-    `;
-
-
-    document.body.appendChild(
-        overlay
-    );
-
-
-    document.getElementById(
-        "skillFire"
-    ).onclick =
-        function () {
-
-            chooseSkill(
+            createProjectile(
+                nearest,
                 "fireball"
             );
 
+        } else if (skill === 1) {
 
-            overlay.remove();
+            createProjectile(
+                nearest,
+                "bullet"
+            );
 
-        };
+        } else {
 
-
-    document.getElementById(
-        "skillGas"
-    ).onclick =
-        function () {
-
-            chooseSkill(
+            createProjectile(
+                nearest,
                 "gas"
             );
-
-
-            overlay.remove();
-
-        };
-
-
-    document.getElementById(
-        "skillGun"
-    ).onclick =
-        function () {
-
-            chooseSkill(
-                "gun"
-            );
-
-
-            overlay.remove();
-
-        };
-
-}
-
-
-/* =====================================================
-   NEAREST ENEMY
-===================================================== */
-
-function getNearestEnemy(
-    maxDistance = 350
-) {
-
-    let nearest =
-        null;
-
-
-    let nearestDistance =
-        maxDistance;
-
-
-    for (
-        const enemy
-        of enemies
-    ) {
-
-        if (
-            enemy.dead
-        ) {
-
-            continue;
-
         }
-
-
-        const distance =
-
-            Math.hypot(
-
-                enemy.x -
-                player.x,
-
-                enemy.y -
-                player.y
-
-            );
-
-
-        if (
-            distance <
-            nearestDistance
-        ) {
-
-            nearest =
-                enemy;
-
-
-            nearestDistance =
-                distance;
-
-        }
-
     }
-
-
-    return nearest;
-
 }
 
 
 /* =====================================================
-   SKILL COOLDOWN
-===================================================== */
-
-let fireCooldown =
-    0;
-
-
-let gasCooldown =
-    0;
-
-
-let gunCooldown =
-    0;
-
-
-/* =====================================================
-   FIREBALL
-===================================================== */
-
-function autoFireball() {
-
-    if (
-        !skills.fireball
-    ) {
-
-        return;
-
-    }
-
-
-    if (
-        fireCooldown >
-        0
-    ) {
-
-        fireCooldown--;
-
-        return;
-
-    }
-
-
-    const target =
-        getNearestEnemy(
-            400
-        );
-
-
-    if (
-        !target
-    ) {
-
-        return;
-
-    }
-
-
-    const dx =
-
-        target.x -
-        player.x;
-
-
-    const dy =
-
-        target.y -
-        player.y;
-
-
-    const distance =
-
-        Math.hypot(
-            dx,
-            dy
-        );
-
-
-    projectiles.push({
-
-        type:
-            "fireball",
-
-        x:
-            player.x,
-
-        y:
-            player.y,
-
-        vx:
-
-            dx /
-            distance *
-            7,
-
-        vy:
-
-            dy /
-            distance *
-            7,
-
-        damage:
-            35,
-
-        life:
-            100
-
-    });
-
-
-    fireCooldown =
-        60;
-
-}
-
-
-/* =====================================================
-   GAS
-===================================================== */
-
-function autoGas() {
-
-    if (
-        !skills.gas
-    ) {
-
-        return;
-
-    }
-
-
-    if (
-        gasCooldown >
-        0
-    ) {
-
-        gasCooldown--;
-
-        return;
-
-    }
-
-
-    const target =
-        getNearestEnemy(
-            300
-        );
-
-
-    if (
-        !target
-    ) {
-
-        return;
-
-    }
-
-
-    projectiles.push({
-
-        type:
-            "gas",
-
-        x:
-            target.x,
-
-        y:
-            target.y,
-
-        vx:
-            0,
-
-        vy:
-            0,
-
-        damage:
-            15,
-
-        life:
-            50,
-
-        radius:
-            60
-
-    });
-
-
-    gasCooldown =
-        80;
-
-}
-
-
-/* =====================================================
-   GUN
-===================================================== */
-
-function autoGun() {
-
-    if (
-        !skills.gun
-    ) {
-
-        return;
-
-    }
-
-
-    if (
-        gunCooldown >
-        0
-    ) {
-
-        gunCooldown--;
-
-        return;
-
-    }
-
-
-    const target =
-        getNearestEnemy(
-            450
-        );
-
-
-    if (
-        !target
-    ) {
-
-        return;
-
-    }
-
-
-    const dx =
-
-        target.x -
-        player.x;
-
-
-    const dy =
-
-        target.y -
-        player.y;
-
-
-    const distance =
-
-        Math.hypot(
-            dx,
-            dy
-        );
-
-
-    projectiles.push({
-
-        type:
-            "bullet",
-
-        x:
-            player.x,
-
-        y:
-            player.y,
-
-        vx:
-
-            dx /
-            distance *
-            10,
-
-        vy:
-
-            dy /
-            distance *
-            10,
-
-        damage:
-            20,
-
-        life:
-            70
-
-    });
-
-
-    gunCooldown =
-        25;
-
-}
-
-
-/* =====================================================
-   SKILLS UPDATE
-===================================================== */
-
-function updateSkills() {
-
-    if (
-        gameOver ||
-        selectingSkill
-    ) {
-
-        return;
-
-    }
-
-
-    autoFireball();
-
-    autoGas();
-
-    autoGun();
-
-}
-
-
-/* =====================================================
-   PROJECTILES UPDATE
+   UPDATE PROJECTILES
 ===================================================== */
 
 function updateProjectiles() {
 
     for (
-        let i =
-            projectiles.length - 1;
-
+        let i = projectiles.length - 1;
         i >= 0;
-
         i--
     ) {
 
-        const p =
-            projectiles[i];
+        const p = projectiles[i];
+
+        p.x += p.vx;
+        p.y += p.vy;
 
 
-        /* GAS */
-
-        if (
-            p.type ===
-            "gas"
-        ) {
-
-            p.life--;
+        let hit = false;
 
 
-            for (
-                const enemy
-                of enemies
-            ) {
+        for (const enemy of enemies) {
 
-                if (
-                    enemy.dead
-                ) {
+            const dx =
+                enemy.x -
+                p.x;
 
-                    continue;
-
-                }
-
-
-                const distance =
-
-                    Math.hypot(
-
-                        enemy.x -
-                        p.x,
-
-                        enemy.y -
-                        p.y
-
-                    );
-
-
-                if (
-                    distance <
-                    p.radius
-                ) {
-
-                    enemy.hp -=
-                        p.damage /
-                        10;
-
-
-                    if (
-                        enemy.hp <=
-                        0
-                    ) {
-
-                        killEnemy(
-                            enemy
-                        );
-
-                    }
-
-                }
-
-            }
-
-
-            if (
-                p.life <=
-                0
-            ) {
-
-                projectiles.splice(
-                    i,
-                    1
-                );
-
-            }
-
-
-            continue;
-
-        }
-
-
-        /* NORMAL PROJECTILE */
-
-        p.x +=
-            p.vx;
-
-
-        p.y +=
-            p.vy;
-
-
-        p.life--;
-
-
-        let hit =
-            false;
-
-
-        for (
-            const enemy
-            of enemies
-        ) {
-
-            if (
-                enemy.dead
-            ) {
-
-                continue;
-
-            }
+            const dy =
+                enemy.y -
+                p.y;
 
 
             const distance =
-
-                Math.hypot(
-
-                    enemy.x -
-                    p.x,
-
-                    enemy.y -
-                    p.y
-
+                Math.sqrt(
+                    dx * dx +
+                    dy * dy
                 );
 
 
-            if (
-                distance <
-                35
-            ) {
+            if (distance < 45) {
 
-                enemy.hp -=
-                    p.damage;
+                enemy.hp -= p.damage;
 
-
-                if (
-                    enemy.hp <=
-                    0
-                ) {
-
-                    killEnemy(
-                        enemy
-                    );
-
-                }
-
-
-                hit =
-                    true;
-
+                hit = true;
 
                 break;
-
             }
-
         }
 
 
         if (
             hit ||
-            p.life <=
-            0
+            p.x < 0 ||
+            p.y < 0 ||
+            p.x > WORLD_SIZE ||
+            p.y > WORLD_SIZE
         ) {
 
-            projectiles.splice(
-                i,
-                1
-            );
-
+            projectiles.splice(i, 1);
         }
-
     }
-
 }
 
 
@@ -3032,1090 +1055,455 @@ function updateProjectiles() {
 function updateCamera() {
 
     camera.x =
-
-        player.x -
+        player.x +
+        player.width / 2 -
         canvas.width / 2;
 
 
     camera.y =
-
-        player.y -
+        player.y +
+        player.height / 2 -
         canvas.height / 2;
 
-}
 
-
-/* =====================================================
-   DRAW MAP
-===================================================== */
-
-function drawMap() {
-
-    /*
-    =========================
-    GRASS
-    =========================
-    */
-
-    if (
-        imageReady(
-            images.grass
-        )
-    ) {
-
-        const size =
-            64;
-
-
-        const startX =
-
-            Math.floor(
-                camera.x /
-                size
-            ) *
-            size;
-
-
-        const startY =
-
-            Math.floor(
-                camera.y /
-                size
-            ) *
-            size;
-
-
-        for (
-            let x =
-                startX;
-
-            x <
-                camera.x +
-                canvas.width +
-                size;
-
-            x += size
-        ) {
-
-            for (
-                let y =
-                    startY;
-
-                y <
-                    camera.y +
-                    canvas.height +
-                    size;
-
-                y += size
-            ) {
-
-                ctx.drawImage(
-
-                    images.grass,
-
-                    x -
-                    camera.x,
-
-                    y -
-                    camera.y,
-
-                    size,
-
-                    size
-
-                );
-
-            }
-
-        }
-
-    } else {
-
-        ctx.fillStyle =
-            "#4caf50";
-
-
-        ctx.fillRect(
-
+    camera.x =
+        Math.max(
             0,
-
-            0,
-
-            canvas.width,
-
-            canvas.height
-
-        );
-
-    }
-
-
-    /*
-    =========================
-    OBSTACLES
-    =========================
-    */
-
-    for (
-        const chunk
-        of chunks.values()
-    ) {
-
-        for (
-            const obstacle
-            of chunk.obstacles
-        ) {
-
-            const sx =
-
-                obstacle.x -
-                camera.x;
-
-
-            const sy =
-
-                obstacle.y -
-                camera.y;
-
-
-            if (
-
-                sx <
-                -100 ||
-
-                sx >
-                canvas.width +
-                100 ||
-
-                sy <
-                -100 ||
-
-                sy >
-                canvas.height +
-                100
-
-            ) {
-
-                continue;
-
-            }
-
-
-            /*
-            TREE
-            */
-
-            if (
-
-                obstacle.type ===
-                "tree"
-
-                &&
-
-                imageReady(
-                    images.tree
-                )
-
-            ) {
-
-                const targetHeight =
-                    85;
-
-
-                const scale =
-
-                    targetHeight /
-                    images.tree.naturalHeight;
-
-
-                const targetWidth =
-
-                    images.tree.naturalWidth *
-                    scale;
-
-
-                ctx.drawImage(
-
-                    images.tree,
-
-                    sx -
-                    targetWidth / 2,
-
-                    sy -
-                    targetHeight / 2,
-
-                    targetWidth,
-
-                    targetHeight
-
-                );
-
-            }
-
-
-            /*
-            ROCK
-            */
-
-            if (
-
-                obstacle.type ===
-                "rock"
-
-                &&
-
-                imageReady(
-                    images.rock
-                )
-
-            ) {
-
-                const targetHeight =
-                    50;
-
-
-                const scale =
-
-                    targetHeight /
-                    images.rock.naturalHeight;
-
-
-                const targetWidth =
-
-                    images.rock.naturalWidth *
-                    scale;
-
-
-                ctx.drawImage(
-
-                    images.rock,
-
-                    sx -
-                    targetWidth / 2,
-
-                    sy -
-                    targetHeight / 2,
-
-                    targetWidth,
-
-                    targetHeight
-
-                );
-
-            }
-
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-   DRAW ENEMY
-===================================================== */
-
-function drawEnemies() {
-
-    for (
-        const enemy
-        of enemies
-    ) {
-
-        if (
-            enemy.dead
-        ) {
-
-            continue;
-
-        }
-
-
-        const sx =
-
-            enemy.x -
-            camera.x;
-
-
-        const sy =
-
-            enemy.y -
-            camera.y;
-
-
-        const enemyImage =
-
-            enemyImages[
-                enemy.imageIndex
-            ];
-
-
-        if (
-            imageReady(
-                enemyImage
+            Math.min(
+                WORLD_SIZE -
+                canvas.width,
+                camera.x
             )
-        ) {
-
-            /*
-            Mỗi ảnh có 4 frame ngang
-            */
-
-            const frameCount =
-                4;
-
-
-            const frameWidth =
-
-                enemyImage.naturalWidth /
-                frameCount;
-
-
-            const frameHeight =
-
-                enemyImage.naturalHeight;
-
-
-            /*
-            Kích thước theo chiều cao
-            */
-
-            const targetHeight =
-
-                enemyDatabase[
-                    enemy.imageIndex
-                ].height;
-
-
-            /*
-            Tự tính chiều rộng
-            */
-
-            const scale =
-
-                targetHeight /
-                frameHeight;
-
-
-            const targetWidth =
-
-                frameWidth *
-                scale;
-
-
-            ctx.save();
-
-
-            if (
-                enemy.direction ===
-                "left"
-            ) {
-
-                ctx.translate(
-                    sx,
-                    sy
-                );
-
-
-                ctx.scale(
-                    -1,
-                    1
-                );
-
-
-                ctx.drawImage(
-
-                    enemyImage,
-
-                    enemy.spriteFrame *
-                    frameWidth,
-
-                    0,
-
-                    frameWidth,
-
-                    frameHeight,
-
-                    -targetWidth / 2,
-
-                    -targetHeight / 2,
-
-                    targetWidth,
-
-                    targetHeight
-
-                );
-
-            } else {
-
-                ctx.drawImage(
-
-                    enemyImage,
-
-                    enemy.spriteFrame *
-                    frameWidth,
-
-                    0,
-
-                    frameWidth,
-
-                    frameHeight,
-
-                    sx -
-                    targetWidth / 2,
-
-                    sy -
-                    targetHeight / 2,
-
-                    targetWidth,
-
-                    targetHeight
-
-                );
-
-            }
-
-
-            ctx.restore();
-
-        } else {
-
-            /*
-            Fallback
-            */
-
-            ctx.fillStyle =
-                "#f44336";
-
-
-            ctx.fillRect(
-
-                sx - 20,
-
-                sy - 20,
-
-                40,
-
-                40
-
-            );
-
-        }
-
-
-        /*
-        =========================
-        HP BAR
-        =========================
-        */
-
-        const hpWidth =
-            45;
-
-
-        const hpHeight =
-            6;
-
-
-        ctx.fillStyle =
-            "rgba(0,0,0,0.8)";
-
-
-        ctx.fillRect(
-
-            sx -
-            hpWidth / 2,
-
-            sy - 48,
-
-            hpWidth,
-
-            hpHeight
-
         );
 
 
-        ctx.fillStyle =
-            "#35e35b";
-
-
-        ctx.fillRect(
-
-            sx -
-            hpWidth / 2,
-
-            sy - 48,
-
-            hpWidth *
-            Math.max(
-
-                0,
-
-                enemy.hp /
-                enemy.maxHp
-
-            ),
-
-            hpHeight
-
+    camera.y =
+        Math.max(
+            0,
+            Math.min(
+                WORLD_SIZE -
+                canvas.height,
+                camera.y
+            )
         );
-
-    }
-
 }
 
 
 /* =====================================================
-   DRAW PLAYER
+   DRAW SPRITE
 ===================================================== */
 
-function drawPlayer() {
-
-    const sx =
-
-        player.x -
-        camera.x;
-
-
-    const sy =
-
-        player.y -
-        camera.y;
-
-
-    /*
-    =========================
-    ATTACK SPRITE
-    =========================
-    */
-
-    if (
-
-        player.isAttacking
-
-        &&
-
-        imageReady(
-            images.playerAttack
-        )
-
-    ) {
-
-        const frameCount =
-            4;
-
-
-        const frameWidth =
-
-            images.playerAttack
-                .naturalWidth /
-            frameCount;
-
-
-        const frameHeight =
-
-            images.playerAttack
-                .naturalHeight;
-
-
-        /*
-        Chiều cao mong muốn
-        */
-
-        const targetHeight =
-            90;
-
-
-        /*
-        Giữ đúng tỉ lệ
-        */
-
-        const scale =
-
-            targetHeight /
-            frameHeight;
-
-
-        const targetWidth =
-
-            frameWidth *
-            scale;
-
-
-        ctx.save();
-
-
-        if (
-            player.direction ===
-            "left"
-        ) {
-
-            ctx.translate(
-                sx,
-                sy
-            );
-
-
-            ctx.scale(
-                -1,
-                1
-            );
-
-
-            ctx.drawImage(
-
-                images.playerAttack,
-
-                player.attackFrame *
-                frameWidth,
-
-                0,
-
-                frameWidth,
-
-                frameHeight,
-
-                -targetWidth / 2,
-
-                -targetHeight / 2,
-
-                targetWidth,
-
-                targetHeight
-
-            );
-
-        } else {
-
-            ctx.drawImage(
-
-                images.playerAttack,
-
-                player.attackFrame *
-                frameWidth,
-
-                0,
-
-                frameWidth,
-
-                frameHeight,
-
-                sx -
-                targetWidth / 2,
-
-                sy -
-                targetHeight / 2,
-
-                targetWidth,
-
-                targetHeight
-
-            );
-
-        }
-
-
-        ctx.restore();
-
-
+function drawSprite(
+    image,
+    x,
+    y,
+    width,
+    height,
+    frame = 0
+) {
+
+    if (!image.complete) {
         return;
-
     }
 
 
-    /*
-    =========================
-    NORMAL PLAYER
-    =========================
-    */
-
-    if (
-        imageReady(
-            images.player
-        )
-    ) {
-
-        const frameCount =
-            4;
+    const frameWidth =
+        image.width / 4;
 
 
-        const frameWidth =
+    ctx.drawImage(
 
-            images.player.naturalWidth /
-            frameCount;
+        image,
 
+        frame * frameWidth,
+        0,
 
-        const frameHeight =
+        frameWidth,
+        image.height,
 
-            images.player.naturalHeight;
+        x,
+        y,
 
-
-        /*
-        Chiều cao player
-        */
-
-        const targetHeight =
-            75;
-
-
-        /*
-        Tự tính width
-        */
-
-        const scale =
-
-            targetHeight /
-            frameHeight;
-
-
-        const targetWidth =
-
-            frameWidth *
-            scale;
-
-
-        ctx.save();
-
-
-        if (
-            player.direction ===
-            "left"
-        ) {
-
-            ctx.translate(
-                sx,
-                sy
-            );
-
-
-            ctx.scale(
-                -1,
-                1
-            );
-
-
-            ctx.drawImage(
-
-                images.player,
-
-                player.spriteFrame *
-                frameWidth,
-
-                0,
-
-                frameWidth,
-
-                frameHeight,
-
-                -targetWidth / 2,
-
-                -targetHeight / 2,
-
-                targetWidth,
-
-                targetHeight
-
-            );
-
-        } else {
-
-            ctx.drawImage(
-
-                images.player,
-
-                player.spriteFrame *
-                frameWidth,
-
-                0,
-
-                frameWidth,
-
-                frameHeight,
-
-                sx -
-                targetWidth / 2,
-
-                sy -
-                targetHeight / 2,
-
-                targetWidth,
-
-                targetHeight
-
-            );
-
-        }
-
-
-        ctx.restore();
-
-    }
-
+        width,
+        height
+    );
 }
 
 
 /* =====================================================
-   DRAW PROJECTILES
+   DRAW WORLD
 ===================================================== */
 
-function drawProjectiles() {
+function drawWorld() {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /* BACKGROUND */
+
+    ctx.fillStyle = "#263b24";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /* GRID */
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,0.025)";
+
+    ctx.lineWidth = 1;
+
+
+    const grid = 80;
+
 
     for (
-        const p
-        of projectiles
+        let x =
+            -camera.x % grid;
+        x < canvas.width;
+        x += grid
     ) {
 
-        const sx =
+        ctx.beginPath();
 
-            p.x -
+        ctx.moveTo(x, 0);
+
+        ctx.lineTo(
+            x,
+            canvas.height
+        );
+
+        ctx.stroke();
+    }
+
+
+    for (
+        let y =
+            -camera.y % grid;
+        y < canvas.height;
+        y += grid
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(0, y);
+
+        ctx.lineTo(
+            canvas.width,
+            y
+        );
+
+        ctx.stroke();
+    }
+
+
+    /* OBSTACLES */
+
+    for (const obstacle of obstacles) {
+
+        const screenX =
+            obstacle.x -
             camera.x;
 
-
-        const sy =
-
-            p.y -
+        const screenY =
+            obstacle.y -
             camera.y;
 
 
-        /*
-        FIREBALL
-        */
+        const image =
+            obstacle.type === "tree"
+                ? images.tree
+                : images.rock;
+
 
         if (
-
-            p.type ===
-            "fireball"
-
-            &&
-
-            imageReady(
-                images.fireball
-            )
-
+            screenX < -150 ||
+            screenX >
+                canvas.width + 150 ||
+            screenY < -150 ||
+            screenY >
+                canvas.height + 150
         ) {
-
-            const targetHeight =
-                36;
-
-
-            const scale =
-
-                targetHeight /
-                images.fireball.naturalHeight;
-
-
-            const targetWidth =
-
-                images.fireball.naturalWidth *
-                scale;
-
-
-            ctx.drawImage(
-
-                images.fireball,
-
-                sx -
-                targetWidth / 2,
-
-                sy -
-                targetHeight / 2,
-
-                targetWidth,
-
-                targetHeight
-
-            );
-
+            continue;
         }
 
 
-        /*
-        BULLET
-        */
-
-        if (
-
-            p.type ===
-            "bullet"
-
-            &&
-
-            imageReady(
-                images.bullet
-            )
-
-        ) {
-
-            const targetHeight =
-                20;
+        const aspect =
+            image.width /
+            image.height;
 
 
-            const scale =
-
-                targetHeight /
-                images.bullet.naturalHeight;
+        const height =
+            obstacle.height;
 
 
-            const targetWidth =
-
-                images.bullet.naturalWidth *
-                scale;
+        const width =
+            height * aspect;
 
 
-            ctx.drawImage(
+        ctx.drawImage(
 
-                images.bullet,
+            image,
 
-                sx -
-                targetWidth / 2,
+            screenX,
+            screenY,
 
-                sy -
-                targetHeight / 2,
-
-                targetWidth,
-
-                targetHeight
-
-            );
-
-        }
-
-
-        /*
-        GAS
-        */
-
-        if (
-
-            p.type ===
-            "gas"
-
-            &&
-
-            imageReady(
-                images.gas
-            )
-
-        ) {
-
-            ctx.globalAlpha =
-                0.6;
-
-
-            ctx.drawImage(
-
-                images.gas,
-
-                sx -
-                p.radius,
-
-                sy -
-                p.radius,
-
-                p.radius * 2,
-
-                p.radius * 2
-
-            );
-
-
-            ctx.globalAlpha =
-                1;
-
-        }
-
+            width,
+            height
+        );
     }
 
-}
 
+    /* DROPS */
 
-/* =====================================================
-   DRAW DROP
-===================================================== */
+    for (const drop of drops) {
 
-function drawDrops() {
-
-    for (
-        const drop
-        of drops
-    ) {
-
-        const sx =
-
+        const x =
             drop.x -
             camera.x;
 
-
-        const sy =
-
+        const y =
             drop.y -
             camera.y;
 
 
-        if (
-            drop.type ===
-            "exp"
-        ) {
+        ctx.font = "24px Arial";
 
-            ctx.fillStyle =
-                "#00ffff";
-
-
-            ctx.beginPath();
-
-
-            ctx.arc(
-
-                sx,
-
-                sy,
-
-                8,
-
-                0,
-
-                Math.PI * 2
-
-            );
-
-
-            ctx.fill();
-
-        }
-
-
-        if (
-            drop.type ===
-            "gold"
-        ) {
-
-            ctx.fillStyle =
-                "#ffd700";
-
-
-            ctx.beginPath();
-
-
-            ctx.arc(
-
-                sx,
-
-                sy,
-
-                8,
-
-                0,
-
-                Math.PI * 2
-
-            );
-
-
-            ctx.fill();
-
-        }
-
+        ctx.fillText(
+            drop.type === "gold"
+                ? "🪙"
+                : "⭐",
+            x,
+            y
+        );
     }
 
+
+    /* ENEMIES */
+
+    for (const enemy of enemies) {
+
+        const x =
+            enemy.x -
+            camera.x;
+
+        const y =
+            enemy.y -
+            camera.y;
+
+
+        if (
+            x < -150 ||
+            x > canvas.width + 150 ||
+            y < -150 ||
+            y > canvas.height + 150
+        ) {
+            continue;
+        }
+
+
+        const aspect =
+            (
+                enemy.image.width / 4
+            ) /
+            enemy.image.height;
+
+
+        const height =
+            enemy.height;
+
+        const width =
+            height * aspect;
+
+
+        drawSprite(
+
+            enemy.image,
+
+            x,
+            y,
+
+            width,
+            height,
+
+            enemy.frame
+        );
+
+
+        /* HP BAR */
+
+        const barWidth = 55;
+
+        const hpPercent =
+            Math.max(
+                0,
+                enemy.hp /
+                enemy.maxHp
+            );
+
+
+        ctx.fillStyle = "#171717";
+
+        ctx.fillRect(
+            x,
+            y - 10,
+            barWidth,
+            6
+        );
+
+
+        ctx.fillStyle = "#e74c3c";
+
+        ctx.fillRect(
+            x,
+            y - 10,
+            barWidth *
+            hpPercent,
+            6
+        );
+    }
+
+
+    /* PROJECTILES */
+
+    for (const p of projectiles) {
+
+        const x =
+            p.x -
+            camera.x;
+
+        const y =
+            p.y -
+            camera.y;
+
+
+        let image;
+
+
+        if (p.type === "fireball") {
+
+            image =
+                images.fireball;
+
+        } else if (
+            p.type === "bullet"
+        ) {
+
+            image =
+                images.bullet;
+
+        } else {
+
+            image =
+                images.gas;
+        }
+
+
+        if (!image.complete) {
+            continue;
+        }
+
+
+        const aspect =
+            image.width /
+            image.height;
+
+
+        const h = 35;
+
+        const w =
+            h * aspect;
+
+
+        ctx.drawImage(
+            image,
+            x - w / 2,
+            y - h / 2,
+            w,
+            h
+        );
+    }
+
+
+    /* PLAYER */
+
+    const px =
+        player.x -
+        camera.x;
+
+    const py =
+        player.y -
+        camera.y;
+
+
+    const image =
+        player.attacking
+            ? images.playerAttack
+            : images.player;
+
+
+    const height =
+        player.attacking
+            ? 90
+            : 75;
+
+
+    const aspect =
+        (
+            image.width / 4
+        ) /
+        image.height;
+
+
+    const width =
+        height * aspect;
+
+
+    ctx.save();
+
+
+    if (player.direction === -1) {
+
+        ctx.translate(
+            px + width,
+            py
+        );
+
+        ctx.scale(-1, 1);
+
+        drawSprite(
+            image,
+            0,
+            0,
+            width,
+            height,
+            player.frame
+        );
+
+    } else {
+
+        drawSprite(
+            image,
+            px,
+            py,
+            width,
+            height,
+            player.frame
+        );
+    }
+
+
+    ctx.restore();
 }
 
 
@@ -4125,208 +1513,99 @@ function drawDrops() {
 
 function drawHUD() {
 
-    /*
-    HP BACKGROUND
-    */
+    /* PANEL */
 
     ctx.fillStyle =
-        "black";
-
+        "rgba(5,7,12,0.75)";
 
     ctx.fillRect(
-
         15,
-
         15,
-
-        220,
-
-        22
-
+        310,
+        110
     );
 
 
-    /*
-    HP
-    */
+    /* HP */
 
-    ctx.fillStyle =
-        "red";
-
+    ctx.fillStyle = "#222";
 
     ctx.fillRect(
+        30,
+        32,
+        270,
+        18
+    );
 
-        15,
 
-        15,
+    ctx.fillStyle = "#e74c3c";
 
-        220 *
+    ctx.fillRect(
+        30,
+        32,
+        270 *
         Math.max(
-
             0,
-
             player.hp /
             player.maxHp
-
         ),
-
-        22
-
+        18
     );
 
 
-    ctx.strokeStyle =
-        "white";
+    ctx.fillStyle = "white";
 
-
-    ctx.strokeRect(
-
-        15,
-
-        15,
-
-        220,
-
-        22
-
-    );
-
-
-    ctx.fillStyle =
-        "white";
-
-
-    ctx.font =
-        "14px Arial";
-
+    ctx.font = "15px Arial";
 
     ctx.fillText(
-
-        `HP: ${Math.floor(
-            player.hp
-        )} / ${player.maxHp}`,
-
-        25,
-
-        31
-
+        `❤️ ${Math.ceil(player.hp)} / ${player.maxHp}`,
+        38,
+        46
     );
 
 
-    /*
-    LEVEL
-    */
+    /* EXP */
 
-    ctx.font =
-        "18px Arial";
+    ctx.fillStyle = "#222";
 
+    ctx.fillRect(
+        30,
+        62,
+        270,
+        12
+    );
+
+
+    ctx.fillStyle = "#45a9ff";
+
+    ctx.fillRect(
+        30,
+        62,
+        270 *
+        (
+            player.exp /
+            player.expNeed
+        ),
+        12
+    );
+
+
+    ctx.fillStyle = "white";
 
     ctx.fillText(
-
-        `Level: ${player.level}`,
-
-        15,
-
-        62
-
+        `⭐ Level ${player.level}`,
+        30,
+        95
     );
 
 
-    /*
-    EXP
-    */
+    ctx.fillStyle = "#ffd75c";
 
     ctx.fillText(
-
-        `EXP: ${Math.floor(
-            player.exp
-        )} / ${player.expNeed}`,
-
-        15,
-
-        86
-
+        `🪙 ${money}`,
+        160,
+        95
     );
-
-
-    /*
-    GOLD
-    */
-
-    ctx.fillText(
-
-        `💰 ${player.money}`,
-
-        15,
-
-        110
-
-    );
-
-
-    /*
-    DAMAGE
-    */
-
-    ctx.fillText(
-
-        `Damage: ${player.damage}`,
-
-        15,
-
-        134
-
-    );
-
-
-    /*
-    SKILLS
-    */
-
-    let skillText =
-        "Skill: ";
-
-
-    if (
-        skills.fireball
-    ) {
-
-        skillText +=
-            "🔥 ";
-
-    }
-
-
-    if (
-        skills.gas
-    ) {
-
-        skillText +=
-            "⛽ ";
-
-    }
-
-
-    if (
-        skills.gun
-    ) {
-
-        skillText +=
-            "🔫 ";
-
-    }
-
-
-    ctx.fillText(
-
-        skillText,
-
-        15,
-
-        158
-
-    );
-
 }
 
 
@@ -4334,337 +1613,559 @@ function drawHUD() {
    GAME OVER
 ===================================================== */
 
-function drawGameOver() {
+function gameOver() {
 
-    if (
-        !gameOver
-    ) {
-
-        return;
-
-    }
+    gameRunning = false;
 
 
     ctx.fillStyle =
         "rgba(0,0,0,0.75)";
 
-
     ctx.fillRect(
-
         0,
-
         0,
-
         canvas.width,
-
         canvas.height
-
     );
 
 
-    ctx.fillStyle =
-        "white";
-
-
-    ctx.textAlign =
-        "center";
-
+    ctx.fillStyle = "#ff5555";
 
     ctx.font =
-        "45px Arial";
+        "bold 60px Arial";
 
+    ctx.textAlign = "center";
 
     ctx.fillText(
-
         "GAME OVER",
-
         canvas.width / 2,
-
         canvas.height / 2 - 30
-
     );
 
 
-    ctx.font =
-        "20px Arial";
+    ctx.fillStyle = "white";
 
+    ctx.font = "22px Arial";
 
     ctx.fillText(
-
-        `Level ${player.level}`,
-
+        "Nhấn Enter để chơi lại",
         canvas.width / 2,
-
-        canvas.height / 2 + 15
-
+        canvas.height / 2 + 30
     );
 
 
-    ctx.fillText(
-
-        "F5 để chơi lại",
-
-        canvas.width / 2,
-
-        canvas.height / 2 + 55
-
-    );
-
-
-    ctx.textAlign =
-        "left";
-
+    ctx.textAlign = "left";
 }
 
 
-/* =====================================================
-   UPDATE
-===================================================== */
+window.addEventListener(
+    "keydown",
+    e => {
 
-function update() {
+        if (
+            e.key === "Enter" &&
+            !gameRunning
+        ) {
 
-    ensureChunksAroundPlayer();
-
-
-    updatePlayerMovement();
-
-
-    updateAttackAnimation();
-
-
-    if (
-        player.attackCooldown >
-        0
-    ) {
-
-        player.attackCooldown--;
-
+            startGame();
+        }
     }
-
-
-    updateEnemies();
-
-
-    updateDrops();
-
-
-    updateSkills();
-
-
-    updateProjectiles();
-
-
-    updateGoldPopups();
-
-
-    updateCamera();
-
-}
+);
 
 
 /* =====================================================
-   DRAW
+   SAVE
 ===================================================== */
 
-function draw() {
+function saveData() {
 
-    ctx.clearRect(
-
-        0,
-
-        0,
-
-        canvas.width,
-
-        canvas.height
-
+    localStorage.setItem(
+        "rpgGold",
+        money
     );
 
+    localStorage.setItem(
+        "damageLevel",
+        damageLevel
+    );
 
-    drawMap();
-
-
-    drawDrops();
-
-
-    drawEnemies();
-
-
-    drawProjectiles();
-
-
-    drawPlayer();
-
-
-    drawHUD();
-
-
-    drawGoldPopups();
-
-
-    drawGameOver();
-
+    localStorage.setItem(
+        "hpLevel",
+        hpLevel
+    );
 }
 
 
 /* =====================================================
-   RESET GAME
+   SHOP
 ===================================================== */
 
-function resetGame() {
+function updateShop() {
+
+    document.getElementById(
+        "homeGold"
+    ).textContent = money;
+
+
+    document.getElementById(
+        "shopGold"
+    ).textContent = money;
+
+
+    document.getElementById(
+        "damageLevel"
+    ).textContent = damageLevel;
+
+
+    document.getElementById(
+        "hpLevel"
+    ).textContent = hpLevel;
+
+
+    document.getElementById(
+        "damageValue"
+    ).textContent =
+        10 + damageLevel * 5;
+
+
+    document.getElementById(
+        "hpValue"
+    ).textContent =
+        100 + hpLevel * 25;
+
+
+    const damagePrice =
+        100 +
+        damageLevel * 100;
+
+
+    const hpPrice =
+        100 +
+        hpLevel * 100;
+
+
+    document.getElementById(
+        "damagePrice"
+    ).textContent =
+        damagePrice;
+
+
+    document.getElementById(
+        "hpPrice"
+    ).textContent =
+        hpPrice;
+
+
+    document.getElementById(
+        "buyDamage"
+    ).disabled =
+        money < damagePrice;
+
+
+    document.getElementById(
+        "buyHP"
+    ).disabled =
+        money < hpPrice;
+}
+
+
+document.getElementById(
+    "buyDamage"
+).addEventListener(
+    "click",
+    () => {
+
+        const price =
+            100 +
+            damageLevel * 100;
+
+
+        if (money >= price) {
+
+            money -= price;
+
+            damageLevel++;
+
+            player.money = money;
+
+            player.damage =
+                10 +
+                damageLevel * 5;
+
+            saveData();
+
+            updateShop();
+        }
+    }
+);
+
+
+document.getElementById(
+    "buyHP"
+).addEventListener(
+    "click",
+    () => {
+
+        const price =
+            100 +
+            hpLevel * 100;
+
+
+        if (money >= price) {
+
+            money -= price;
+
+            hpLevel++;
+
+            player.money = money;
+
+            player.maxHp =
+                100 +
+                hpLevel * 25;
+
+            player.hp =
+                player.maxHp;
+
+            saveData();
+
+            updateShop();
+        }
+    }
+);
+
+
+/* =====================================================
+   START GAME
+===================================================== */
+
+let gameRunning = false;
+
+
+function startGame() {
+
+    homeScreen.style.display =
+        "none";
+
+    shopScreen.style.display =
+        "none";
+
+    gameScreen.style.display =
+        "block";
+
 
     player.x =
-        CHUNK_SIZE / 2;
-
+        WORLD_SIZE / 2;
 
     player.y =
-        CHUNK_SIZE / 2;
+        WORLD_SIZE / 2;
 
 
     player.maxHp =
-
         100 +
-        savedHpLevel *
-        20;
-
+        hpLevel * 25;
 
     player.hp =
         player.maxHp;
 
 
-    player.level =
-        1;
-
-
-    player.exp =
-        0;
-
-
-    player.expNeed =
-        100;
-
-
-    player.money =
-        savedGold;
-
-
     player.damage =
-
-        25 +
-        savedDamageLevel *
-        5;
+        10 +
+        damageLevel * 5;
 
 
-    player.attackCooldown =
-        0;
+    player.level = 1;
 
+    player.exp = 0;
 
-    player.isAttacking =
-        false;
-
-
-    player.attackFrame =
-        0;
-
-
-    player.attackFrameTimer =
-        0;
-
-
-    player.spriteFrame =
-        0;
-
-
-    player.spriteTimer =
-        0;
-
-
-    player.moving =
-        false;
-
-
-    gameOver =
-        false;
-
-
-    selectingSkill =
-        false;
+    player.expNeed = 100;
 
 
     enemies = [];
 
-
     drops = [];
-
 
     projectiles = [];
 
 
-    chunks.clear();
+    createObstacles();
 
 
-    skills.fireball =
-        false;
+    for (let i = 0; i < 15; i++) {
+
+        spawnEnemy();
+    }
 
 
-    skills.gas =
-        false;
-
-
-    skills.gun =
-        false;
-
-
-    fireCooldown =
-        0;
-
-
-    gasCooldown =
-        0;
-
-
-    gunCooldown =
-        0;
-
-
-    goldPopups = [];
-
-
-    ensureChunksAroundPlayer();
-
-
-    updateCamera();
-
+    gameRunning = true;
 }
 
 
 /* =====================================================
-   START
+   MENU
 ===================================================== */
 
-showHome();
+playBtn.addEventListener(
+    "click",
+    startGame
+);
 
 
-updateGoldUI();
+shopBtn.addEventListener(
+    "click",
+    () => {
+
+        homeScreen.style.display =
+            "none";
+
+        shopScreen.style.display =
+            "flex";
+
+        updateShop();
+    }
+);
 
 
-gameLoop();
+backHomeBtn.addEventListener(
+    "click",
+    () => {
+
+        shopScreen.style.display =
+            "none";
+
+        homeScreen.style.display =
+            "flex";
+
+        updateShop();
+    }
+);
+
+
+gameMenuBtn.addEventListener(
+    "click",
+    () => {
+
+        gameRunning = false;
+
+        gameScreen.style.display =
+            "none";
+
+        homeScreen.style.display =
+            "flex";
+
+        updateShop();
+    }
+);
+
+
+/* =====================================================
+   MOBILE CONTROLS
+===================================================== */
+
+document.querySelectorAll(
+    ".joy-btn"
+).forEach(button => {
+
+    const key =
+        button.dataset.key;
+
+
+    function press(e) {
+
+        e.preventDefault();
+
+        keys[key] = true;
+    }
+
+
+    function release(e) {
+
+        e.preventDefault();
+
+        keys[key] = false;
+    }
+
+
+    button.addEventListener(
+        "touchstart",
+        press,
+        {
+            passive: false
+        }
+    );
+
+
+    button.addEventListener(
+        "touchend",
+        release,
+        {
+            passive: false
+        }
+    );
+
+
+    button.addEventListener(
+        "touchcancel",
+        release,
+        {
+            passive: false
+        }
+    );
+
+
+    /* PC test */
+
+    button.addEventListener(
+        "mousedown",
+        press
+    );
+
+
+    button.addEventListener(
+        "mouseup",
+        release
+    );
+
+
+    button.addEventListener(
+        "mouseleave",
+        release
+    );
+});
+
+
+/* =====================================================
+   MOBILE ATTACK
+===================================================== */
+
+const attackBtn =
+    document.getElementById(
+        "attackBtn"
+    );
+
+
+function attackPress(e) {
+
+    e.preventDefault();
+
+    keys[" "] = true;
+
+    attack();
+}
+
+
+function attackRelease(e) {
+
+    e.preventDefault();
+
+    keys[" "] = false;
+}
+
+
+attackBtn.addEventListener(
+    "touchstart",
+    attackPress,
+    {
+        passive: false
+    }
+);
+
+
+attackBtn.addEventListener(
+    "touchend",
+    attackRelease,
+    {
+        passive: false
+    }
+);
+
+
+attackBtn.addEventListener(
+    "touchcancel",
+    attackRelease,
+    {
+        passive: false
+    }
+);
+
+
+/* PC mouse test */
+
+attackBtn.addEventListener(
+    "mousedown",
+    attackPress
+);
+
+
+attackBtn.addEventListener(
+    "mouseup",
+    attackRelease
+);
 
 
 /* =====================================================
    GAME LOOP
 ===================================================== */
 
+let enemySpawnTimer = 0;
+
+
 function gameLoop() {
 
-    update();
+    if (gameRunning) {
+
+        movePlayer();
+
+        updateAttack();
+
+        updateEnemies();
+
+        updateDrops();
+
+        updateProjectiles();
+
+        autoSkills();
+
+        updateCamera();
 
 
-    draw();
+        enemySpawnTimer++;
+
+
+        if (
+            enemySpawnTimer > 90 &&
+            enemies.length < 25
+        ) {
+
+            spawnEnemy();
+
+            enemySpawnTimer = 0;
+        }
+
+
+        drawWorld();
+
+        drawHUD();
+
+
+        if (player.hp <= 0) {
+
+            player.hp = 0;
+
+            gameOver();
+        }
+    }
 
 
     requestAnimationFrame(
         gameLoop
     );
-
 }
+
+
+/* =====================================================
+   INIT
+===================================================== */
+
+updateShop();
+
+gameLoop();
